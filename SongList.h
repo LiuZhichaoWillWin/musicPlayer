@@ -6,10 +6,13 @@
 #include <QList>
 #include <vector>
 #include <set>
+#include<QMediaPlayer>
+#include <QMediaPlaylist>
 
-class SongList: public QList<QUrl> {
+class SongList: public QList<QUrl>,public QMediaPlaylist {
     friend class Control;
 private:
+
 
 public:
     SongList();
@@ -18,5 +21,7 @@ public:
     QUrl& getItem(int index);
     QStringList returnPlayList();
     bool addToMyLove();
+
+
 };
 #endif // SONGLIST_H

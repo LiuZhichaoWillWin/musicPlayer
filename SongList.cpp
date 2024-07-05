@@ -1,5 +1,7 @@
 #include "SongList.h"
 
+
+
 void SongList::addSong(QString filePath) {
     QUrl url(QUrl::fromLocalFile(filePath));
     this->append(filePath);
@@ -30,5 +32,4 @@ QStringList SongList::returnPlayList() {
     }
     return list;
 }
-
 

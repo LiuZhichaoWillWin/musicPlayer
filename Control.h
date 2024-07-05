@@ -12,6 +12,8 @@
 #include<QTimer>
 #include <QString>
 #include<QtMath>
+#include <QMediaPlaylist>
+#include <random>
 #include "SongList.h"
 
 QT_BEGIN_NAMESPACE
@@ -44,13 +46,21 @@ private slots:
 
     void on_horizontalSlider_valueChanged(int value);
 
+
+    void changePlayMode();
+
+    void on_playMode_clicked();
+
 private:
     Ui::Control *ui;
     SongList playList;
     QMediaPlayer *mediaPlayer;
     int index;
+    int oldVolume;
     QTimer *timer;
     SongList songNameList;
+    int playMode = 0;
+    std::random_device rd;  // 非确定性随机数生成器
 
     void newSong();
     void newTimer();

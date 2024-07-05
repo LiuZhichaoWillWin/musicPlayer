@@ -5,7 +5,6 @@
         <file>pic2/4.png</file>
         <file>pic2/5.png</file>
         <file>pic2/6.png</file>
-        <file>pic2/7.png</file>
         <file>pic2/8.png</file>
         <file>pic2/IMG_20231001_164635.jpg</file>
         <file>pic2/9.png</file>
@@ -14,5 +13,7 @@
         <file>pic2/11.jpg</file>
         <file>pic2/2.png</file>
         <file>pic2/20160628141711_ZxaJA.jpeg</file>
+        <file>pic2/12.png</file>
+        <file>pic2/7.png</file>
     </qresource>
 </RCC>

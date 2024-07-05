@@ -9,12 +9,12 @@ Control::Control(QWidget *parent)
     ui->setupUi(this);
     mediaPlayer = new QMediaPlayer(this);
     index = 0;
-
     timer = new QTimer(this);
     timer->start(10);
     connect(timer, &QTimer::timeout, this, &Control::on_timer_timeout);
 
-    ui->volumeSlider->setValue(mediaPlayer->volume());
+    ui->volumeSlider->setValue(100);
+    connect(mediaPlayer, &QMediaPlayer::stateChanged, this, &Control::changePlayMode);
 
     setPauseImage();
 }
@@ -48,6 +48,7 @@ void Control::on_musicList_clicked(bool checked)
         //把音乐放在listweidget中展示
         ui->listWidget->clear();
         ui->listWidget->addItems(songNameList.returnPlayList());
+
         //默认选中第一个音乐
         ui->listWidget->setCurrentRow(0);
 
@@ -58,11 +59,7 @@ void Control::on_musicList_clicked(bool checked)
 }
 
 void Control::newSong() {
-    if (mediaPlayer != nullptr) {
-        delete mediaPlayer;
-    }
     index = ui->listWidget->currentRow();
-    mediaPlayer = new QMediaPlayer();
     mediaPlayer->setMedia(playList[index]);
 
     // 总时长
@@ -99,7 +96,6 @@ void Control::setPlayImage() {
 
 void Control::on_pre_clicked(bool checked)
 {
-    if (mediaPlayer->media().isNull()) return;
     if (index == 0) index = playList.length();
     index = --index % (playList.length());
     ui->listWidget->setCurrentRow(index);
@@ -152,6 +148,7 @@ void Control::on_play_clicked(bool checked)
        }
     }
 
+
 }
 
 
@@ -188,14 +185,63 @@ void Control::on_horizontalSlider_valueChanged(int value)
 
 void Control::setVolume1image()
 {
-        mediaPlayer->setVolume(0);
-        ui->volume->setStyleSheet("  background-image: url(:/pic2/9.png);");
-        ui->volumeSlider->hide();
+    oldVolume = ui->volumeSlider->value();
+    ui->volumeSlider->setValue(0);
+//    qDebug() <<  "设置了静音后的音量" << mediaPlayer->volume();
+    ui->volume->setStyleSheet("  background-image: url(:/pic2/9.png);");
+    ui->volumeSlider->hide();
 }
 
 void Control::setVolume2image()
 {
-        ui->volume->setStyleSheet("  background-image: url(:/pic2/5.png);");
-        ui->volumeSlider->show();
-        mediaPlayer->setVolume(50);
+    ui->volume->setStyleSheet("  background-image: url(:/pic2/5.png);");
+    ui->volumeSlider->show();
+    ui->volumeSlider->setValue(oldVolume);
+//    qDebug() << ui->volumeSlider->value() << " " << oldVolume;
 }
+
+
+
+void Control::changePlayMode()
+{
+    if (mediaPlayer->media().isNull()) return;
+    if (playMode == 0) {
+        qDebug() << "顺序" << endl;
+        ui->playMode->setStyleSheet(" background-image: url(:/pic2/7.png); ");
+        if (mediaPlayer->state() == QMediaPlayer::StoppedState && mediaPlayer->position() == mediaPlayer->duration()) {
+            ui->listWidget->setCurrentRow(index);
+            newSong();
+        }
+    }
+    else if (playMode == 1) {
+        qDebug() << "随机" << endl;
+        ui->playMode->setStyleSheet(" background-image: url(:/pic2/6.png); ");
+        std::mt19937 gen(rd()); // 以随机设备作为种子的Mersenne Twister生成器
+
+        if (mediaPlayer->state() == QMediaPlayer::StoppedState && mediaPlayer->position() == mediaPlayer->duration()) {
+            // 定义随机数的分布范围
+            std::uniform_real_distribution<> distr(0, playList.length() - 1);
+            int random_number = distr(gen);
+            qDebug() << "随机数" << random_number;
+            ui->listWidget->setCurrentRow(random_number);
+            newSong();
+        }
+    }
+    else {
+        qDebug() << "循环" << endl;
+        ui->playMode->setStyleSheet(" background-image: url(:/pic2/12.png) ");
+        if (playMode == 2) {
+            if (mediaPlayer->state() == QMediaPlayer::StoppedState && mediaPlayer->position() == mediaPlayer->duration()) {
+                newSong();
+            }
+        }
+    }
+}
+
+void Control::on_playMode_clicked()
+{
+    qDebug() << "mode";
+    playMode = ++playMode % 3;
+    changePlayMode();
+}
+
