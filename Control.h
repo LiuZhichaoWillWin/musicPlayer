@@ -15,6 +15,7 @@
 #include <QMediaPlaylist>
 #include <random>
 #include "SongList.h"
+#include <vector>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Control; }
@@ -23,7 +24,7 @@ QT_END_NAMESPACE
 class Control : public QWidget
 {
     Q_OBJECT
-
+    friend class SongList;
 public:
     Control(QWidget *parent = nullptr);
     ~Control();
@@ -46,7 +47,7 @@ private slots:
 
     void on_horizontalSlider_valueChanged(int value);
 
-
+    void on_loveSong_clicked(bool checked);
     void changePlayMode();
 
     void on_playMode_clicked();
@@ -61,6 +62,8 @@ private:
     SongList songNameList;
     int playMode = 0;
     std::random_device rd;  // 非确定性随机数生成器
+    std::vector<size_t> randomlyPlayedSongs;
+    bool isMyLove;
 
     void newSong();
     void newTimer();
@@ -69,6 +72,7 @@ private:
     void noPlayeList();
     void setVolume1image();
     void setVolume2image();
+    std::vector<size_t> returnUnplayedSongsIndexs();
 
 };
 #endif // CONTROL_H

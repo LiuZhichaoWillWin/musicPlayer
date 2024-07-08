@@ -30,7 +30,6 @@ void Control::on_musicList_clicked(bool checked)
      //打开对话框让用户选择音乐所在目录
         auto path = QFileDialog::getExistingDirectory(this, "选择歌曲所在目录","D:\\柳志超\\音乐MP3");
      //根据这个路径，获取里面所有的mp3文件
-        qInfo() << path <<endl;
         QDir dir(path);
         auto musicList = dir.entryList(QStringList()<<"*.mp3");
 
@@ -82,6 +81,17 @@ void Control::newSong() {
 
     mediaPlayer->play();
     setPlayImage();
+
+    QDir myLove("D:\\MusicPlayer\\myLove");
+    QStringList myLoveSongs = myLove.entryList();
+    isMyLove = false;
+    for (auto fileName : myLoveSongs) {
+        if (songNameList[index].toString() == fileName) {
+            isMyLove = true;
+            break;
+        }
+    }
+    qDebug() << isMyLove;
 }
 
 
@@ -200,7 +210,23 @@ void Control::setVolume2image()
 //    qDebug() << ui->volumeSlider->value() << " " << oldVolume;
 }
 
-
+std::vector<size_t> Control::returnUnplayedSongsIndexs() {
+    if (randomlyPlayedSongs.size() == playList.length())
+        randomlyPlayedSongs.clear();
+    std::vector<size_t> unplayedSongsIndexs;
+    for (size_t i = 0; i < playList.length(); i++) {
+        int isRandomlyPlayed = false;
+        for (int j = 0; j < randomlyPlayedSongs.size(); j++) {
+            if (i == randomlyPlayedSongs[j]) {
+                isRandomlyPlayed = true;
+                continue;
+            }
+        }
+        if (!isRandomlyPlayed)
+            unplayedSongsIndexs.push_back(i);
+    }
+    return unplayedSongsIndexs;
+}
 
 void Control::changePlayMode()
 {
@@ -209,6 +235,7 @@ void Control::changePlayMode()
         qDebug() << "顺序" << endl;
         ui->playMode->setStyleSheet(" background-image: url(:/pic2/7.png); ");
         if (mediaPlayer->state() == QMediaPlayer::StoppedState && mediaPlayer->position() == mediaPlayer->duration()) {
+            index = ++index % playList.length();
             ui->listWidget->setCurrentRow(index);
             newSong();
         }
@@ -220,9 +247,10 @@ void Control::changePlayMode()
 
         if (mediaPlayer->state() == QMediaPlayer::StoppedState && mediaPlayer->position() == mediaPlayer->duration()) {
             // 定义随机数的分布范围
-            std::uniform_real_distribution<> distr(0, playList.length() - 1);
-            int random_number = distr(gen);
-            qDebug() << "随机数" << random_number;
+            randomlyPlayedSongs.push_back(index);
+            std::vector<size_t> randomlyUnplayedSongsIndexs = returnUnplayedSongsIndexs();
+            std::uniform_real_distribution<> distr(0, randomlyUnplayedSongsIndexs.size() - 1);
+            int random_number = randomlyUnplayedSongsIndexs[distr(gen)];
             ui->listWidget->setCurrentRow(random_number);
             newSong();
         }
@@ -243,5 +271,18 @@ void Control::on_playMode_clicked()
     qDebug() << "mode";
     playMode = ++playMode % 3;
     changePlayMode();
+}
+
+
+void Control::on_loveSong_clicked(bool checked)
+{
+    if (isMyLove) {
+        playList.deleteFromMyLove(songNameList[index].toString());
+        isMyLove = false;
+    }
+    else {
+        playList.addToMyLove(playList[index].toString(), songNameList[index].toString());
+        isMyLove = true;
+    }
 }
 

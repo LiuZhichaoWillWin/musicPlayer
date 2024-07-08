@@ -248,6 +248,23 @@ repeat: no-repeat;</string>
     <string/>
    </property>
   </widget>
+  <widget class="QPushButton" name="loveSong">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>660</y>
+     <width>51</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-image: url(:/pic2/14.png);
+</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
   <zorder>label_2</zorder>
   <zorder>label</zorder>
   <zorder>horizontalSlider</zorder>
@@ -261,6 +278,7 @@ repeat: no-repeat;</string>
   <zorder>position</zorder>
   <zorder>duration</zorder>
   <zorder>playMode</zorder>
+  <zorder>loveSong</zorder>
  </widget>
  <resources/>
  <connections/>
